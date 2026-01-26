@@ -68,12 +68,12 @@ public sealed class VideoJsInterop: IVideoJsInterop
         }
     }
 
-    public ValueTask Initialize(bool useCdn = true, CancellationToken cancellationToken = default)
+    public async ValueTask Initialize(bool useCdn = true, CancellationToken cancellationToken = default)
     {
         var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
 
         using (source)
-            return _scriptInitializer.Init(useCdn, linked);
+            await _scriptInitializer.Init(useCdn, linked);
     }
 
     public async ValueTask Create(ElementReference elementReference, string elementId, VideoJsConfiguration? configuration = null,
@@ -92,36 +92,36 @@ public sealed class VideoJsInterop: IVideoJsInterop
         }
     }
 
-    public ValueTask UpdateSources(string elementId, List<VideoJsSource> sources, CancellationToken cancellationToken = default)
+    public async ValueTask UpdateSources(string elementId, List<VideoJsSource> sources, CancellationToken cancellationToken = default)
     {
         var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
 
         using (source)
-            return _jsRuntime.InvokeVoidAsync("VideoJsInterop.updateSources", linked, elementId, sources);
+            await _jsRuntime.InvokeVoidAsync("VideoJsInterop.updateSources", linked, elementId, sources);
     }
 
-    public ValueTask SetPoster(string elementId, string? poster, CancellationToken cancellationToken = default)
+    public async ValueTask SetPoster(string elementId, string? poster, CancellationToken cancellationToken = default)
     {
         var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
 
         using (source)
-            return _jsRuntime.InvokeVoidAsync("VideoJsInterop.setPoster", linked, elementId, poster);
+            await _jsRuntime.InvokeVoidAsync("VideoJsInterop.setPoster", linked, elementId, poster);
     }
 
-    public ValueTask RegisterEvent(string elementId, string eventName, DotNetObjectReference<VideoJsEventBridge> dotNetReference,
+    public async ValueTask RegisterEvent(string elementId, string eventName, DotNetObjectReference<VideoJsEventBridge> dotNetReference,
         string callbackMethod, CancellationToken cancellationToken = default)
     {
         var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
 
         using (source)
-            return _jsRuntime.InvokeVoidAsync("VideoJsInterop.registerEvent", linked, elementId, eventName, dotNetReference, callbackMethod);
+            await _jsRuntime.InvokeVoidAsync("VideoJsInterop.registerEvent", linked, elementId, eventName, dotNetReference, callbackMethod);
     }
 
-    public ValueTask Dispose(string elementId, CancellationToken cancellationToken = default)
+    public async ValueTask Dispose(string elementId, CancellationToken cancellationToken = default)
     {
         var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
 
         using (source)
-            return _jsRuntime.InvokeVoidAsync("VideoJsInterop.dispose", linked, elementId);
+            await _jsRuntime.InvokeVoidAsync("VideoJsInterop.dispose", linked, elementId);
     }
 }
