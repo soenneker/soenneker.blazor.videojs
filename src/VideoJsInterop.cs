@@ -11,6 +11,8 @@ using Soenneker.Blazor.Videojs.Configuration;
 using Soenneker.Blazor.Videojs.Dtos;
 using Soenneker.Blazor.Utils.ResourceLoader.Abstract;
 using Soenneker.Asyncs.Initializers;
+using Soenneker.Extensions.CancellationTokens;
+using Soenneker.Utils.CancellationScopes;
 using Soenneker.Utils.Json;
 
 namespace Soenneker.Blazor.Videojs;
@@ -31,6 +33,8 @@ public sealed class VideoJsInterop: IVideoJsInterop
     private const string _cdnScriptIntegrity = "sha256-rNCoGkzHiSjxUwWYdi7Xg+6RZnS/OgvypsJqbAsW7Us=";
     private const string _localCssUrl = "_content/Soenneker.Blazor.Videojs/css/video-js.min.css";
     private const string _localScriptUrl = "_content/Soenneker.Blazor.Videojs/js/video.min.js";
+
+    private readonly CancellationScope _cancellationScope = new();
 
     public VideoJsInterop(IJSRuntime jSRuntime, ILogger<VideoJsInterop> logger, IResourceLoader resourceLoader)
     {
@@ -66,38 +70,58 @@ public sealed class VideoJsInterop: IVideoJsInterop
 
     public ValueTask Initialize(bool useCdn = true, CancellationToken cancellationToken = default)
     {
-        return _scriptInitializer.Init(useCdn, cancellationToken);
+        var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
+
+        using (source)
+            return _scriptInitializer.Init(useCdn, linked);
     }
 
     public async ValueTask Create(ElementReference elementReference, string elementId, VideoJsConfiguration? configuration = null,
         CancellationToken cancellationToken = default)
     {
-        bool useCdn = configuration?.UseCdn ?? true;
-        await _scriptInitializer.Init(useCdn, cancellationToken);
+        var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
 
-        string? json = configuration == null ? null : JsonUtil.Serialize(configuration);
+        using (source)
+        {
+            bool useCdn = configuration?.UseCdn ?? true;
+            await _scriptInitializer.Init(useCdn, linked);
 
-        await _jsRuntime.InvokeVoidAsync("VideoJsInterop.create", cancellationToken, elementReference, elementId, json);
+            string? json = configuration == null ? null : JsonUtil.Serialize(configuration);
+
+            await _jsRuntime.InvokeVoidAsync("VideoJsInterop.create", linked, elementReference, elementId, json);
+        }
     }
 
     public ValueTask UpdateSources(string elementId, List<VideoJsSource> sources, CancellationToken cancellationToken = default)
     {
-        return _jsRuntime.InvokeVoidAsync("VideoJsInterop.updateSources", cancellationToken, elementId, sources);
+        var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
+
+        using (source)
+            return _jsRuntime.InvokeVoidAsync("VideoJsInterop.updateSources", linked, elementId, sources);
     }
 
     public ValueTask SetPoster(string elementId, string? poster, CancellationToken cancellationToken = default)
     {
-        return _jsRuntime.InvokeVoidAsync("VideoJsInterop.setPoster", cancellationToken, elementId, poster);
+        var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
+
+        using (source)
+            return _jsRuntime.InvokeVoidAsync("VideoJsInterop.setPoster", linked, elementId, poster);
     }
 
     public ValueTask RegisterEvent(string elementId, string eventName, DotNetObjectReference<VideoJsEventBridge> dotNetReference,
         string callbackMethod, CancellationToken cancellationToken = default)
     {
-        return _jsRuntime.InvokeVoidAsync("VideoJsInterop.registerEvent", cancellationToken, elementId, eventName, dotNetReference, callbackMethod);
+        var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
+
+        using (source)
+            return _jsRuntime.InvokeVoidAsync("VideoJsInterop.registerEvent", linked, elementId, eventName, dotNetReference, callbackMethod);
     }
 
     public ValueTask Dispose(string elementId, CancellationToken cancellationToken = default)
     {
-        return _jsRuntime.InvokeVoidAsync("VideoJsInterop.dispose", cancellationToken, elementId);
+        var linked = _cancellationScope.CancellationToken.Link(cancellationToken, out var source);
+
+        using (source)
+            return _jsRuntime.InvokeVoidAsync("VideoJsInterop.dispose", linked, elementId);
     }
 }
