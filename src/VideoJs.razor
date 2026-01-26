@@ -1,0 +1,234 @@
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using Microsoft.JSInterop
+@using Soenneker.Blazor.Videojs.Abstract
+@using Soenneker.Blazor.Videojs.Configuration
+@using Soenneker.Blazor.Videojs.Dtos
+@using Soenneker.Blazor.Extensions.EventCallback
+@inherits Soenneker.Quark.CoreCancellableComponent
+
+@inject IVideoJsInterop VideoJsInterop
+
+<video id="@Id"
+       @ref="_elementReference"
+       class="@ResolvedClass"
+       @attributes="Attributes">
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else if (Configuration.Sources?.Count > 0)
+    {
+        foreach (VideoJsSource source in Configuration.Sources)
+        {
+            <source src="@source.Src" type="@source.Type" />
+        }
+    }
+</video>
+
+@code {
+    private ElementReference _elementReference;
+    private bool _initialized;
+    private int _sourcesHash;
+    private string? _poster;
+    private VideoJsEventBridge? _eventBridge;
+    private DotNetObjectReference<VideoJsEventBridge>? _eventBridgeReference;
+    private readonly Dictionary<string, EventCallback> _eventCallbacks = new(StringComparer.OrdinalIgnoreCase);
+
+    [Parameter]
+    public string? Class { get; set; }
+
+    [Parameter]
+    public VideoJsConfiguration Configuration { get; set; } = new();
+
+    [Parameter]
+    public IReadOnlyList<VideoJsSource>? Sources { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback OnReady { get; set; }
+
+    [Parameter]
+    public EventCallback OnPlay { get; set; }
+
+    [Parameter]
+    public EventCallback OnPause { get; set; }
+
+    [Parameter]
+    public EventCallback OnEnded { get; set; }
+
+    [Parameter]
+    public EventCallback OnTimeUpdate { get; set; }
+
+    [Parameter]
+    public EventCallback OnLoadedMetadata { get; set; }
+
+    [Parameter]
+    public EventCallback OnLoadedData { get; set; }
+
+    [Parameter]
+    public EventCallback OnCanPlay { get; set; }
+
+    [Parameter]
+    public EventCallback OnCanPlayThrough { get; set; }
+
+    [Parameter]
+    public EventCallback OnSeeking { get; set; }
+
+    [Parameter]
+    public EventCallback OnSeeked { get; set; }
+
+    [Parameter]
+    public EventCallback OnWaiting { get; set; }
+
+    [Parameter]
+    public EventCallback OnPlaying { get; set; }
+
+    [Parameter]
+    public EventCallback OnDurationChange { get; set; }
+
+    [Parameter]
+    public EventCallback OnRateChange { get; set; }
+
+    [Parameter]
+    public EventCallback OnVolumeChange { get; set; }
+
+    [Parameter]
+    public EventCallback OnProgress { get; set; }
+
+    [Parameter]
+    public EventCallback OnStalled { get; set; }
+
+    [Parameter]
+    public EventCallback OnSuspend { get; set; }
+
+    [Parameter]
+    public EventCallback OnAbort { get; set; }
+
+    [Parameter]
+    public EventCallback OnError { get; set; }
+
+    [Parameter]
+    public EventCallback OnEmptied { get; set; }
+
+    private string ResolvedClass =>
+        string.IsNullOrWhiteSpace(Class) ? "video-js vjs-default-skin" : $"video-js vjs-default-skin {Class}";
+
+    protected override void OnParametersSet()
+    {
+        Id ??= $"videojs-{Guid.NewGuid():N}";
+
+        if (Sources != null)
+            Configuration.Sources = Sources.ToList();
+
+        BuildEventMap();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await VideoJsInterop.Create(_elementReference, Id!, Configuration, cancellationToken: CancellationToken);
+            _initialized = true;
+            _sourcesHash = ComputeSourcesHash(Configuration.Sources);
+            _poster = Configuration.Poster;
+
+            if (_eventCallbacks.Count > 0)
+            {
+                _eventBridge = new VideoJsEventBridge(_eventCallbacks);
+                _eventBridgeReference = DotNetObjectReference.Create(_eventBridge);
+                foreach (var eventName in _eventCallbacks.Keys)
+                {
+                    await VideoJsInterop.RegisterEvent(Id!, eventName, _eventBridgeReference, nameof(VideoJsEventBridge.OnEvent), cancellationToken: CancellationToken);
+                }
+            }
+
+            return;
+        }
+
+        if (!_initialized)
+            return;
+
+        int newSourcesHash = ComputeSourcesHash(Configuration.Sources);
+
+        if (newSourcesHash != _sourcesHash)
+        {
+            _sourcesHash = newSourcesHash;
+            await VideoJsInterop.UpdateSources(Id!, Configuration.Sources ?? new List<VideoJsSource>(), cancellationToken: CancellationToken);
+        }
+
+        if (_poster != Configuration.Poster)
+        {
+            _poster = Configuration.Poster;
+            await VideoJsInterop.SetPoster(Id!, _poster, cancellationToken: CancellationToken);
+        }
+    }
+
+    private static int ComputeSourcesHash(List<VideoJsSource>? sources)
+    {
+        if (sources == null || sources.Count == 0)
+            return 0;
+
+        var hash = new HashCode();
+
+        foreach (VideoJsSource source in sources)
+        {
+            hash.Add(source.Src);
+            hash.Add(source.Type);
+            hash.Add(source.Label);
+            hash.Add(source.Res);
+            hash.Add(source.Selected);
+        }
+
+        return hash.ToHashCode();
+    }
+
+    private void BuildEventMap()
+    {
+        _eventCallbacks.Clear();
+
+        AddEventCallback("ready", OnReady);
+        AddEventCallback("play", OnPlay);
+        AddEventCallback("pause", OnPause);
+        AddEventCallback("ended", OnEnded);
+        AddEventCallback("timeupdate", OnTimeUpdate);
+        AddEventCallback("loadedmetadata", OnLoadedMetadata);
+        AddEventCallback("loadeddata", OnLoadedData);
+        AddEventCallback("canplay", OnCanPlay);
+        AddEventCallback("canplaythrough", OnCanPlayThrough);
+        AddEventCallback("seeking", OnSeeking);
+        AddEventCallback("seeked", OnSeeked);
+        AddEventCallback("waiting", OnWaiting);
+        AddEventCallback("playing", OnPlaying);
+        AddEventCallback("durationchange", OnDurationChange);
+        AddEventCallback("ratechange", OnRateChange);
+        AddEventCallback("volumechange", OnVolumeChange);
+        AddEventCallback("progress", OnProgress);
+        AddEventCallback("stalled", OnStalled);
+        AddEventCallback("suspend", OnSuspend);
+        AddEventCallback("abort", OnAbort);
+        AddEventCallback("error", OnError);
+        AddEventCallback("emptied", OnEmptied);
+    }
+
+    private void AddEventCallback(string eventName, EventCallback callback)
+    {
+        if (callback.HasDelegate)
+            _eventCallbacks[eventName] = callback;
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        if (_initialized)
+            await VideoJsInterop.Dispose(Id!);
+
+        _eventBridgeReference?.Dispose();
+        _eventBridgeReference = null;
+        _eventBridge = null;
+
+        await base.DisposeAsync();
+    }
+}

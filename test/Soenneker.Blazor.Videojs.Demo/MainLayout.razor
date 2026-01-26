@@ -1,0 +1,33 @@
+@inherits LayoutComponentBase
+
+<div class="page">
+    <header class="site-header">
+        <div class="container site-header__inner">
+            <div class="brand">
+                <img src="https://user-images.githubusercontent.com/4441470/224455560-91ed3ee7-f510-4041-a8d2-3fc093025112.png"
+                     alt="Soenneker logo" />
+                <div>
+                    <div class="brand__title">Soenneker.Blazor.Videojs</div>
+                    <div class="brand__subtitle">Video.js interop for Blazor</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a class="btn btn-outline-light" href="https://github.com/soenneker/soenneker.blazor.videojs" target="_blank" rel="noopener">
+                    GitHub
+                </a>
+                <a class="btn btn-light" href="https://videojs.org/guides/options/" target="_blank" rel="noopener">
+                    Options Guide
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-content">
+        @Body
+    </main>
+
+    <footer class="site-footer">
+        <div class="container site-footer__inner">
+        </div>
+    </footer>
+</div>

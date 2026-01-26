@@ -1,0 +1,160 @@
+@page "/"
+@using Soenneker.Blazor.Videojs
+@using Soenneker.Blazor.Videojs.Configuration
+@using Soenneker.Blazor.Videojs.Dtos
+
+<section class="hero container">
+    <div class="hero__copy">
+        <div class="eyebrow">Video.js + Blazor</div>
+        <h1>Stunning playback. Pragmatic integration.</h1>
+        <p>
+            This demo showcases the Soenneker Video.js wrapper with a production-ready
+            configuration, responsive layout, and clean interop lifecycle.
+        </p>
+        <div class="hero__meta">
+            <div>
+                <div class="meta__label">Version</div>
+                <div class="meta__value">Video.js 8</div>
+            </div>
+            <div>
+                <div class="meta__label">CDN</div>
+                <div class="meta__value">jsDelivr</div>
+            </div>
+            <div>
+                <div class="meta__label">Focus</div>
+                <div class="meta__value">UX + Stability</div>
+            </div>
+        </div>
+    </div>
+    <div class="hero__player card-glass">
+        <div class="card-glass__header">
+            <span>Primary Player</span>
+            <span class="badge badge-soft">Adaptive layout</span>
+        </div>
+        <VideoJs Configuration="PrimaryConfig" Class="video-shadow" />
+        <div class="card-glass__footer">
+            <span>Skip buttons + playback rates enabled</span>
+            <span>Poster + responsive aspect ratio</span>
+        </div>
+    </div>
+</section>
+
+<section class="feature-band">
+    <div class="container feature-grid">
+        <div class="feature-card">
+            <h3>Fast setup</h3>
+            <p>Single component, one configuration object. Loads Video.js from jsDelivr only.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Responsive by default</h3>
+            <p>Fluid sizing with tuned breakpoints keeps the UI crisp on every surface.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Playback controls</h3>
+            <p>Playback rates, skip buttons, and clean control bar configuration.</p>
+        </div>
+        <div class="feature-card">
+            <h3>Interop lifecycle</h3>
+            <p>Safe dispose and source updates for dynamic Blazor experiences.</p>
+        </div>
+    </div>
+</section>
+
+<section class="container demo-grid">
+    <div class="demo-card">
+        <h2>Razor component usage</h2>
+        <p>Drop the VideoJs component into a Blazor page.</p>
+        <pre><code>@RazorSnippet</code></pre>
+    </div>
+    <div class="demo-card">
+        <h2>Configuration example</h2>
+        <p>Use the same options documented in the Video.js guide.</p>
+        <pre><code>@ConfigSnippet</code></pre>
+    </div>
+</section>
+
+@code {
+    private readonly VideoJsConfiguration PrimaryConfig = new()
+    {
+        Controls = true,
+        Autoplay = "muted",
+        Muted = true,
+        Preload = "auto",
+        Fluid = true,
+        Responsive = true,
+        AspectRatio = "16:9",
+        Poster = "https://vjs.zencdn.net/v/oceans.png",
+        PlaybackRates = [0.5, 1, 1.5, 2],
+        ControlBar = new VideoJsControlBarOptions
+        {
+            RemainingTimeDisplay = new VideoJsRemainingTimeDisplayOptions
+            {
+                DisplayNegative = false
+            },
+            SkipButtons = new VideoJsSkipButtonsOptions
+            {
+                Backward = 10,
+                Forward = 10
+            }
+        },
+        Sources =
+        [
+            new VideoJsSource { Src = "https://vjs.zencdn.net/v/oceans.mp4", Type = "video/mp4" },
+            new VideoJsSource { Src = "https://vjs.zencdn.net/v/oceans.webm", Type = "video/webm" }
+        ]
+    };
+
+    private readonly VideoJsConfiguration SecondaryConfig = new()
+    {
+        Controls = true,
+        Muted = true,
+        Preload = "metadata",
+        Fluid = true,
+        Responsive = true,
+        AspectRatio = "4:3",
+        Poster = "https://vjs.zencdn.net/v/oceans.png",
+        PlaybackRates = [0.75, 1, 1.25],
+        Sources =
+        [
+            new VideoJsSource { Src = "https://vjs.zencdn.net/v/oceans.mp4", Type = "video/mp4" }
+        ]
+    };
+
+    private readonly VideoJsConfiguration AudioConfig = new()
+    {
+        Controls = true,
+        Autoplay = false,
+        AudioOnlyMode = true,
+        AudioPosterMode = true,
+        Fluid = true,
+        Responsive = true,
+        Poster = "https://vjs.zencdn.net/v/oceans.png",
+        Sources =
+        [
+            new VideoJsSource { Src = "https://vjs.zencdn.net/v/oceans.mp4", Type = "audio/mp4" }
+        ]
+    };
+
+    private const string ConfigSnippet = """
+var config = new VideoJsConfiguration
+{
+    Controls = true,
+    Autoplay = "muted",
+    Muted = true,
+    AspectRatio = "16:9",
+    PlaybackRates = [0.5, 1, 1.5, 2],
+    ControlBar = new VideoJsControlBarOptions
+    {
+        SkipButtons = new VideoJsSkipButtonsOptions { Backward = 10, Forward = 10 }
+    },
+    Sources =
+    [
+        new VideoJsSource { Src = "https://vjs.zencdn.net/v/oceans.mp4", Type = "video/mp4" }
+    ]
+};
+""";
+
+    private const string RazorSnippet = """
+<VideoJs Configuration="config" />
+""";
+}
