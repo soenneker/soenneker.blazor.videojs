@@ -17,6 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Soenneker.Blazor.Videojs.csproj" />
+        <ProjectReference Include="..\..\src\Soenneker.Blazor.Videojs\Soenneker.Blazor.Videojs.csproj" />
     </ItemGroup>
 </Project>
