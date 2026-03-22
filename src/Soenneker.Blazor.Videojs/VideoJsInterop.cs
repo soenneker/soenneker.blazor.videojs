@@ -59,7 +59,7 @@ public sealed class VideoJsInterop: IVideoJsInterop
                 await _resourceLoader.LoadStyle(_localCssUrl, cancellationToken: cancellationToken);
                 await _resourceLoader.LoadScriptAndWaitForVariable(_localScriptUrl, "videojs", cancellationToken: cancellationToken);
             }
-            await _resourceLoader.ImportModuleAndWaitUntilAvailable(_module, _moduleName, 100, cancellationToken);
+            await _resourceLoader.ImportModule(_module, cancellationToken);
         }
         catch (JSException ex)
         {
