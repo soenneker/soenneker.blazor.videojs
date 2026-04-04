@@ -3,75 +3,80 @@
 @using Soenneker.Blazor.Videojs.Configuration
 @using Soenneker.Blazor.Videojs.Dtos
 
-<section class="hero container">
-    <div class="hero__copy">
-        <div class="eyebrow">Video.js + Blazor</div>
-        <h1>Stunning playback. Pragmatic integration.</h1>
-        <p>
-            This demo showcases the Soenneker Video.js wrapper with a production-ready
-            configuration, responsive layout, and clean interop lifecycle.
-        </p>
-        <div class="hero__meta">
-            <div>
-                <div class="meta__label">Version</div>
-                <div class="meta__value">Video.js 8</div>
-            </div>
-            <div>
-                <div class="meta__label">CDN</div>
-                <div class="meta__value">jsDelivr</div>
-            </div>
-            <div>
-                <div class="meta__label">Focus</div>
-                <div class="meta__value">UX + Stability</div>
-            </div>
-        </div>
-    </div>
-    <div class="hero__player card-glass">
-        <div class="card-glass__header">
-            <span>Primary Player</span>
-            <span class="badge badge-soft">Adaptive layout</span>
-        </div>
-        <VideoJs Configuration="PrimaryConfig" Class="video-shadow" />
-        <div class="card-glass__footer">
-            <span>Skip buttons + playback rates enabled</span>
-            <span>Poster + responsive aspect ratio</span>
-        </div>
-    </div>
-</section>
+<Div Space="Space.Y.Is6">
+    <Grid Columns="Columns.Is1.OnLg.Is2" Gap="Gap.Is4">
+        <Div Space="Space.Y.Is4">
+            <Paragraph Margin="Margin.Is0" TextSize="TextSize.Sm" FontWeight="FontWeight.Medium" TextColor="TextColor.MutedForeground">
+                Video.js + Blazor
+            </Paragraph>
+            <H1 TextSize="TextSize.TwoXl" FontWeight="FontWeight.Semibold" Margin="Margin.Is0">
+                Playback with the Soenneker Video.js wrapper
+            </H1>
+            <Paragraph TextColor="TextColor.MutedForeground" Margin="Margin.Is0">
+                Production-style configuration, responsive layout, and a clean interop lifecycle. Assets load from jsDelivr.
+            </Paragraph>
+            <Grid Columns="Columns.Is3" Gap="Gap.Is3">
+                <Div>
+                    <Paragraph Margin="Margin.Is0" TextSize="TextSize.Xs" TextColor="TextColor.MutedForeground">Version</Paragraph>
+                    <Paragraph Margin="Margin.Is0" FontWeight="FontWeight.Medium">Video.js 8</Paragraph>
+                </Div>
+                <Div>
+                    <Paragraph Margin="Margin.Is0" TextSize="TextSize.Xs" TextColor="TextColor.MutedForeground">CDN</Paragraph>
+                    <Paragraph Margin="Margin.Is0" FontWeight="FontWeight.Medium">jsDelivr</Paragraph>
+                </Div>
+                <Div>
+                    <Paragraph Margin="Margin.Is0" TextSize="TextSize.Xs" TextColor="TextColor.MutedForeground">Focus</Paragraph>
+                    <Paragraph Margin="Margin.Is0" FontWeight="FontWeight.Medium">UX + stability</Paragraph>
+                </Div>
+            </Grid>
+        </Div>
 
-<section class="feature-band">
-    <div class="container feature-grid">
-        <div class="feature-card">
-            <h3>Fast setup</h3>
-            <p>Single component, one configuration object. Loads Video.js from jsDelivr only.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Responsive by default</h3>
-            <p>Fluid sizing with tuned breakpoints keeps the UI crisp on every surface.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Playback controls</h3>
-            <p>Playback rates, skip buttons, and clean control bar configuration.</p>
-        </div>
-        <div class="feature-card">
-            <h3>Interop lifecycle</h3>
-            <p>Safe dispose and source updates for dynamic Blazor experiences.</p>
-        </div>
-    </div>
-</section>
+        <DemoPanel Title="Primary player"
+                   Description="Fluid 16:9, poster, skip ±10s, playback rates.">
+            <HeaderExtra>
+                <Span TextSize="TextSize.Xs"
+                      FontWeight="FontWeight.Medium"
+                      Rounded="Rounded.Full"
+                      Border="Border.Is1"
+                      BorderColor="BorderColor.Border"
+                      Padding='Padding.Token("1").OnX.Token("2").OnY'>
+                    Adaptive layout
+                </Span>
+            </HeaderExtra>
+            <ChildContent>
+                <VideoJs Configuration="PrimaryConfig" Class="video-shadow" />
+                <Paragraph Margin="Margin.Is0" TextSize="TextSize.Sm" TextColor="TextColor.MutedForeground">
+                    Muted autoplay where the browser allows; controls reflect configuration below.
+                </Paragraph>
+            </ChildContent>
+        </DemoPanel>
+    </Grid>
 
-<section class="container demo-grid">
-    <div class="demo-card">
-        <h2>Razor component usage</h2>
-        <p>Drop the VideoJs component into a Blazor page.</p>
-        <pre><code>@RazorSnippet</code></pre>
-    </div>
-    <div class="demo-card">
-        <h2>Configuration example</h2>
-        <p>Use the same options documented in the Video.js guide.</p>
-        <pre><code>@ConfigSnippet</code></pre>
-    </div>
-</section>
+    <Grid Columns="Columns.Is1.OnMd.Is2" Gap="Gap.Is4">
+        <DemoPanel Title="Compact 4:3" Description="Alternate aspect ratio and fewer playback rates.">
+            <VideoJs Configuration="SecondaryConfig" Class="video-compact" />
+        </DemoPanel>
+        <DemoPanel Title="Audio-oriented" Description="Audio-only mode with poster for compact players.">
+            <VideoJs Configuration="AudioConfig" Class="video-compact" />
+        </DemoPanel>
+    </Grid>
+
+    <Grid Columns="Columns.Is1.OnMd.Is2.OnLg.Is4" Gap="Gap.Is4">
+        <DemoPanel Title="Fast setup" Description="One component and one configuration object." />
+        <DemoPanel Title="Responsive" Description="Fluid sizing keeps the control bar usable on small widths." />
+        <DemoPanel Title="Playback controls" Description="Rates, skip buttons, and tuned control bar options." />
+        <DemoPanel Title="Interop lifecycle" Description="Dispose-safe for dynamic Blazor navigation." />
+    </Grid>
+
+    <Grid Columns="Columns.Is1.OnMd.Is2" Gap="Gap.Is4">
+        <DemoPanel Title="Razor usage" Description="Drop VideoJs on any page.">
+            <pre class="video-demo-pre"><code>@RazorSnippet</code></pre>
+        </DemoPanel>
+        <DemoPanel Title="Configuration" Description="Strongly typed options mirroring Video.js.">
+            <pre class="video-demo-pre"><code>@ConfigSnippet</code></pre>
+        </DemoPanel>
+    </Grid>
+</Div>
 
 @code {
     private readonly VideoJsConfiguration PrimaryConfig = new()
