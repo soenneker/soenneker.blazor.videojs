@@ -1,11 +1,8 @@
-@using System
-@using System.Collections.Generic
 @using System.Linq
 @using Microsoft.JSInterop
 @using Soenneker.Blazor.Videojs.Abstract
 @using Soenneker.Blazor.Videojs.Configuration
 @using Soenneker.Blazor.Videojs.Dtos
-@using Soenneker.Blazor.Extensions.EventCallback
 @inherits Soenneker.Quark.CoreCancellableComponent
 
 @inject IVideoJsInterop VideoJsInterop
@@ -140,7 +137,7 @@
             {
                 _eventBridge = new VideoJsEventBridge(_eventCallbacks);
                 _eventBridgeReference = DotNetObjectReference.Create(_eventBridge);
-                foreach (var eventName in _eventCallbacks.Keys)
+                foreach (string eventName in _eventCallbacks.Keys)
                 {
                     await VideoJsInterop.RegisterEvent(Id!, eventName, _eventBridgeReference, nameof(VideoJsEventBridge.OnEvent), cancellationToken: CancellationToken);
                 }

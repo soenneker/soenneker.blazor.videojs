@@ -1,18 +1,18 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Soenneker.Blazor.Videojs.Configuration;
 using Soenneker.Blazor.Videojs.Dtos;
-using Soenneker.Blazor.Videojs;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Soenneker.Blazor.Videojs.Abstract;
 
 /// <summary>
 /// A Blazor interop library for Video.js
 /// </summary>
-public interface IVideoJsInterop
+public interface IVideoJsInterop : IAsyncDisposable
 {
     ValueTask Initialize(bool useCdn = true, CancellationToken cancellationToken = default);
 
