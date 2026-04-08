@@ -19,13 +19,13 @@ namespace Soenneker.Blazor.Videojs;
 /// <inheritdoc cref="IVideoJsInterop"/>
 public sealed class VideoJsInterop : IVideoJsInterop
 {
-    private const string _modulePath = "/_content/Soenneker.Blazor.Videojs/js/videojsinterop.js";
+    private const string _modulePath = "_content/Soenneker.Blazor.Videojs/js/videojsinterop.js";
     private const string _cdnCssUrl = "https://cdn.jsdelivr.net/npm/video.js@8.23.4/dist/video-js.min.css";
     private const string _cdnCssIntegrity = "sha256-aZM6nunxxsAVKRkQNSLoYiISSWTiGV0o6y0MBDwm9Zw=";
     private const string _cdnScriptUrl = "https://cdn.jsdelivr.net/npm/video.js@8.23.4/dist/video.min.js";
     private const string _cdnScriptIntegrity = "sha256-rNCoGkzHiSjxUwWYdi7Xg+6RZnS/OgvypsJqbAsW7Us=";
-    private const string _localCssUrl = "/_content/Soenneker.Blazor.Videojs/css/video-js.min.css";
-    private const string _localScriptUrl = "/_content/Soenneker.Blazor.Videojs/js/video.min.js";
+    private const string _localCssUrl = "_content/Soenneker.Blazor.Videojs/css/video-js.min.css";
+    private const string _localScriptUrl = "_content/Soenneker.Blazor.Videojs/js/video.min.js";
 
     private readonly ILogger<VideoJsInterop> _logger;
     private readonly IResourceLoader _resourceLoader;
