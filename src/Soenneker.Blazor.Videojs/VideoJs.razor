@@ -3,6 +3,7 @@
 @using Soenneker.Blazor.Videojs.Abstract
 @using Soenneker.Blazor.Videojs.Configuration
 @using Soenneker.Blazor.Videojs.Dtos
+@using Soenneker.Blazor.Utils.Ids
 @inherits Soenneker.Quark.CoreCancellableComponent
 
 @inject IVideoJsInterop VideoJsInterop
@@ -116,7 +117,7 @@
 
     protected override void OnParametersSet()
     {
-        Id ??= $"videojs-{Guid.NewGuid():N}";
+        Id ??= BlazorIdGenerator.New("videojs");
 
         if (Sources != null)
             Configuration.Sources = Sources.ToList();
