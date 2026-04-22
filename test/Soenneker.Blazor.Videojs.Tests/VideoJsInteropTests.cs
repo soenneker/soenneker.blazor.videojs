@@ -1,20 +1,19 @@
 using Soenneker.Blazor.Videojs.Abstract;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Blazor.Videojs.Tests;
 
-[Collection("Collection")]
-public sealed class VideoJsInteropTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public sealed class VideoJsInteropTests : HostedUnitTest
 {
     private readonly IVideoJsInterop _blazorlibrary;
 
-    public VideoJsInteropTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public VideoJsInteropTests(Host host) : base(host)
     {
         _blazorlibrary = Resolve<IVideoJsInterop>(true);
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
 
