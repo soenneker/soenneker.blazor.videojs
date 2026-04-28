@@ -4,7 +4,7 @@
 @using Soenneker.Blazor.Videojs.Dtos
 
 <Div Space="Space.Y.Is6">
-    <Grid Columns="Columns.Is1.OnLg.Is2" Gap="Gap.Is4">
+    <Grid Columns="GridCols.Is1.OnLg.Is2" Gap="Gap.Is4">
         <Div Space="Space.Y.Is4">
             <Paragraph Margin="Margin.Is0" TextSize="TextSize.Sm" FontWeight="FontWeight.Medium" TextColor="TextColor.MutedForeground">
                 Video.js + Blazor
@@ -15,7 +15,7 @@
             <Paragraph TextColor="TextColor.MutedForeground" Margin="Margin.Is0">
                 Production-style configuration, responsive layout, and a clean interop lifecycle. Assets load from jsDelivr.
             </Paragraph>
-            <Grid Columns="Columns.Is3" Gap="Gap.Is3">
+            <Grid Columns="GridCols.Is3" Gap="Gap.Is3">
                 <Div>
                     <Paragraph Margin="Margin.Is0" TextSize="TextSize.Xs" TextColor="TextColor.MutedForeground">Version</Paragraph>
                     <Paragraph Margin="Margin.Is0" FontWeight="FontWeight.Medium">Video.js 8</Paragraph>
@@ -52,7 +52,7 @@
         </DemoPanel>
     </Grid>
 
-    <Grid Columns="Columns.Is1.OnMd.Is2" Gap="Gap.Is4">
+    <Grid Columns="GridCols.Is1.OnMd.Is2" Gap="Gap.Is4">
         <DemoPanel Title="Compact 4:3" Description="Alternate aspect ratio and fewer playback rates.">
             <VideoJs Configuration="SecondaryConfig" Class="video-compact" />
         </DemoPanel>
@@ -61,14 +61,14 @@
         </DemoPanel>
     </Grid>
 
-    <Grid Columns="Columns.Is1.OnMd.Is2.OnLg.Is4" Gap="Gap.Is4">
+    <Grid Columns="GridCols.Is1.OnMd.Is2.OnLg.Is4" Gap="Gap.Is4">
         <DemoPanel Title="Fast setup" Description="One component and one configuration object." />
         <DemoPanel Title="Responsive" Description="Fluid sizing keeps the control bar usable on small widths." />
         <DemoPanel Title="Playback controls" Description="Rates, skip buttons, and tuned control bar options." />
         <DemoPanel Title="Interop lifecycle" Description="Dispose-safe for dynamic Blazor navigation." />
     </Grid>
 
-    <Grid Columns="Columns.Is1.OnMd.Is2" Gap="Gap.Is4">
+    <Grid Columns="GridCols.Is1.OnMd.Is2" Gap="Gap.Is4">
         <DemoPanel Title="Razor usage" Description="Drop VideoJs on any page.">
             <pre class="video-demo-pre"><code>@RazorSnippet</code></pre>
         </DemoPanel>

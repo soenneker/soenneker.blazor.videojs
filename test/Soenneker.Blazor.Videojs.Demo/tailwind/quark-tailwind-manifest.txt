@@ -10,8 +10,13 @@ font-semibold
 gap-2
 gap-3
 gap-4
+grid-cols-1
+grid-cols-3
 inline-flex
+lg:grid-cols-2
+lg:grid-cols-4
 m-0
+md:grid-cols-2
 pb-4
 px-1
 px-4
