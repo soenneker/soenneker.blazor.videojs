@@ -4,14 +4,14 @@
 @using Soenneker.Blazor.Videojs.Configuration
 @using Soenneker.Blazor.Videojs.Dtos
 @using Soenneker.Blazor.Utils.Ids
-@inherits Soenneker.Quark.CoreCancellableComponent
+@inherits Soenneker.Lepton.Suite.LeptonCancellableIdentifiableContentElement
 
 @inject IVideoJsInterop VideoJsInterop
 
 <video id="@Id"
        @ref="_elementReference"
        class="@ResolvedClass"
-       @attributes="Attributes">
+       @attributes="EffectiveAttributes">
     @if (ChildContent != null)
     {
         @ChildContent
