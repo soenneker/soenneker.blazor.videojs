@@ -18,6 +18,11 @@ public sealed class VideoJsEventBridge
         _eventCallbacks = eventCallbacks;
     }
 
+    /// <summary>
+    /// Executes the on event operation.
+    /// </summary>
+    /// <param name="eventName">The event name.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     [JSInvokable]
     public async Task OnEvent(string eventName)
     {
