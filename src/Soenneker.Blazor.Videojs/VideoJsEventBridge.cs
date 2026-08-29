@@ -19,10 +19,10 @@ public sealed class VideoJsEventBridge
     }
 
     /// <summary>
-    /// Executes the on event operation.
+    /// Responds when event occurs.
     /// </summary>
-    /// <param name="eventName">The event name.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <param name="eventName">Name of the event to publish or subscribe to.</param>
+    /// <returns>A task that completes when the on event operation is complete.</returns>
     [JSInvokable]
     public async Task OnEvent(string eventName)
     {
