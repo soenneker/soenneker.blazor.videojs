@@ -64,6 +64,15 @@ public interface IVideoJsInterop : IAsyncDisposable
         string callbackMethod, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Removes a previously registered Video.js event callback.
+    /// </summary>
+    /// <param name="elementId">ID of the player element.</param>
+    /// <param name="eventName">Video.js event name.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    /// <returns>A task that completes when the event callback has been removed.</returns>
+    ValueTask UnregisterEvent(string elementId, string eventName, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Releases resources used by the current instance.
     /// </summary>
     /// <param name="elementId">ID of the DOM element to target.</param>

@@ -33,9 +33,10 @@
     private VideoJsEventBridge? _eventBridge;
     private DotNetObjectReference<VideoJsEventBridge>? _eventBridgeReference;
     private readonly Dictionary<string, EventCallback> _eventCallbacks = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _registeredEvents = new(StringComparer.OrdinalIgnoreCase);
 
     [Parameter]
-    public string? Class { get; set; }
+    public new string? Class { get; set; }
 
     [Parameter]
     public VideoJsConfiguration Configuration { get; set; } = new();
@@ -44,7 +45,7 @@
     public IReadOnlyList<VideoJsSource>? Sources { get; set; }
 
     [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    public new RenderFragment? ChildContent { get; set; }
 
     [Parameter]
     public EventCallback OnReady { get; set; }
@@ -134,21 +135,15 @@
             _sourcesHash = ComputeSourcesHash(Configuration.Sources);
             _poster = Configuration.Poster;
 
-            if (_eventCallbacks.Count > 0)
-            {
-                _eventBridge = new VideoJsEventBridge(_eventCallbacks);
-                _eventBridgeReference = DotNetObjectReference.Create(_eventBridge);
-                foreach (string eventName in _eventCallbacks.Keys)
-                {
-                    await VideoJsInterop.RegisterEvent(Id!, eventName, _eventBridgeReference, nameof(VideoJsEventBridge.OnEvent), cancellationToken: CancellationToken);
-                }
-            }
+            await SynchronizeEvents();
 
             return;
         }
 
         if (!_initialized)
             return;
+
+        await SynchronizeEvents();
 
         int newSourcesHash = ComputeSourcesHash(Configuration.Sources);
 
@@ -218,15 +213,49 @@
             _eventCallbacks[eventName] = callback;
     }
 
+    private async ValueTask SynchronizeEvents()
+    {
+        foreach (string eventName in _registeredEvents.Except(_eventCallbacks.Keys).ToList())
+        {
+            await VideoJsInterop.UnregisterEvent(Id!, eventName, CancellationToken);
+            _registeredEvents.Remove(eventName);
+        }
+
+        if (_eventCallbacks.Count > 0 && _eventBridgeReference == null)
+        {
+            _eventBridge = new VideoJsEventBridge(_eventCallbacks);
+            _eventBridgeReference = DotNetObjectReference.Create(_eventBridge);
+        }
+
+        foreach (string eventName in _eventCallbacks.Keys.Except(_registeredEvents).ToList())
+        {
+            await VideoJsInterop.RegisterEvent(Id!, eventName, _eventBridgeReference!, nameof(VideoJsEventBridge.OnEvent), CancellationToken);
+            _registeredEvents.Add(eventName);
+        }
+
+        if (_registeredEvents.Count == 0)
+        {
+            _eventBridgeReference?.Dispose();
+            _eventBridgeReference = null;
+            _eventBridge = null;
+        }
+    }
+
     public override async ValueTask DisposeAsync()
     {
-        if (_initialized)
-            await VideoJsInterop.Dispose(Id!);
+        try
+        {
+            if (_initialized)
+                await VideoJsInterop.Dispose(Id!);
+        }
+        finally
+        {
+            _eventBridgeReference?.Dispose();
+            _eventBridgeReference = null;
+            _eventBridge = null;
+            _registeredEvents.Clear();
 
-        _eventBridgeReference?.Dispose();
-        _eventBridgeReference = null;
-        _eventBridge = null;
-
-        await base.DisposeAsync();
+            await base.DisposeAsync();
+        }
     }
 }

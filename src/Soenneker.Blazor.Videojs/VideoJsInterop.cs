@@ -10,6 +10,7 @@ using Soenneker.Blazor.Videojs.Dtos;
 using Soenneker.Extensions.CancellationTokens;
 using Soenneker.Utils.CancellationScopes;
 using Soenneker.Utils.Json;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ public sealed class VideoJsInterop : IVideoJsInterop
     private readonly AsyncInitializer<bool> _scriptInitializer;
 
     private readonly CancellationScope _cancellationScope = new();
+    private int _disposed;
 
     public VideoJsInterop(ILogger<VideoJsInterop> logger, IResourceLoader resourceLoader, IModuleImportUtil moduleImportUtil)
     {
@@ -69,6 +71,7 @@ public sealed class VideoJsInterop : IVideoJsInterop
 
     public async ValueTask Initialize(bool useCdn = true, CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
@@ -78,6 +81,7 @@ public sealed class VideoJsInterop : IVideoJsInterop
     public async ValueTask Create(ElementReference elementReference, string elementId, VideoJsConfiguration? configuration = null,
         CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
@@ -94,6 +98,7 @@ public sealed class VideoJsInterop : IVideoJsInterop
 
     public async ValueTask UpdateSources(string elementId, List<VideoJsSource> sources, CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
@@ -105,6 +110,7 @@ public sealed class VideoJsInterop : IVideoJsInterop
 
     public async ValueTask SetPoster(string elementId, string? poster, CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
@@ -117,6 +123,8 @@ public sealed class VideoJsInterop : IVideoJsInterop
     public async ValueTask RegisterEvent(string elementId, string eventName, DotNetObjectReference<VideoJsEventBridge> dotNetReference, string callbackMethod,
         CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
+
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
@@ -126,8 +134,22 @@ public sealed class VideoJsInterop : IVideoJsInterop
         }
     }
 
+    public async ValueTask UnregisterEvent(string elementId, string eventName, CancellationToken cancellationToken = default)
+    {
+        ThrowIfDisposed();
+
+        CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
+
+        using (source)
+        {
+            IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await jsRef.InvokeVoidAsync("unregisterEvent", linked, elementId, eventName);
+        }
+    }
+
     public async ValueTask Dispose(string elementId, CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
         CancellationToken linked = _cancellationScope.CancellationToken.Link(cancellationToken, out CancellationTokenSource? source);
 
         using (source)
@@ -137,13 +159,19 @@ public sealed class VideoJsInterop : IVideoJsInterop
         }
     }
 
-    /// <summary>
-    /// Asynchronously releases resources used by the current instance.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous operation.</returns>
+    private void ThrowIfDisposed()
+    {
+        if (Volatile.Read(ref _disposed) != 0)
+            throw new ObjectDisposedException(nameof(VideoJsInterop));
+    }
+
     public async ValueTask DisposeAsync()
     {
-        await _moduleImportUtil.DisposeContentModule(_modulePath);
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+            return;
+
         await _cancellationScope.DisposeAsync();
+        await _scriptInitializer.DisposeAsync();
+        await _moduleImportUtil.DisposeContentModule(_modulePath);
     }
 }
