@@ -215,10 +215,23 @@
 
     private async ValueTask SynchronizeEvents()
     {
-        foreach (string eventName in _registeredEvents.Except(_eventCallbacks.Keys).ToList())
+        List<string>? removedEvents = null;
+        foreach (string eventName in _registeredEvents)
         {
-            await VideoJsInterop.UnregisterEvent(Id!, eventName, CancellationToken);
-            _registeredEvents.Remove(eventName);
+            if (!_eventCallbacks.ContainsKey(eventName))
+            {
+                removedEvents ??= [];
+                removedEvents.Add(eventName);
+            }
+        }
+
+        if (removedEvents != null)
+        {
+            foreach (string eventName in removedEvents)
+            {
+                await VideoJsInterop.UnregisterEvent(Id!, eventName, CancellationToken);
+                _registeredEvents.Remove(eventName);
+            }
         }
 
         if (_eventCallbacks.Count > 0 && _eventBridgeReference == null)
@@ -227,10 +240,23 @@
             _eventBridgeReference = DotNetObjectReference.Create(_eventBridge);
         }
 
-        foreach (string eventName in _eventCallbacks.Keys.Except(_registeredEvents).ToList())
+        List<string>? addedEvents = null;
+        foreach (KeyValuePair<string, EventCallback> entry in _eventCallbacks)
         {
-            await VideoJsInterop.RegisterEvent(Id!, eventName, _eventBridgeReference!, nameof(VideoJsEventBridge.OnEvent), CancellationToken);
-            _registeredEvents.Add(eventName);
+            if (!_registeredEvents.Contains(entry.Key))
+            {
+                addedEvents ??= [];
+                addedEvents.Add(entry.Key);
+            }
+        }
+
+        if (addedEvents != null)
+        {
+            foreach (string eventName in addedEvents)
+            {
+                await VideoJsInterop.RegisterEvent(Id!, eventName, _eventBridgeReference!, nameof(VideoJsEventBridge.OnEvent), CancellationToken);
+                _registeredEvents.Add(eventName);
+            }
         }
 
         if (_registeredEvents.Count == 0)
