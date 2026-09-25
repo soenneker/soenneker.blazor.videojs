@@ -20,6 +20,11 @@ namespace Soenneker.Blazor.Videojs;
 /// <inheritdoc cref="IVideoJsInterop"/>
 public sealed class VideoJsInterop : IVideoJsInterop
 {
+    private readonly System.Text.Json.JsonSerializerOptions _jsonOptions;
+
+    private System.Text.Json.Serialization.Metadata.JsonTypeInfo<T> GetJsonTypeInfo<T>() =>
+        (System.Text.Json.Serialization.Metadata.JsonTypeInfo<T>)_jsonOptions.GetTypeInfo(typeof(T));
+
     private const string _modulePath = "_content/Soenneker.Blazor.Videojs/js/videojsinterop.js";
     private const string _cdnCssUrl = "https://cdn.jsdelivr.net/npm/video.js@8.24.0/dist/video-js.min.css";
     private const string _cdnCssIntegrity = "sha256-aZM6nunxxsAVKRkQNSLoYiISSWTiGV0o6y0MBDwm9Zw=";
@@ -36,8 +41,9 @@ public sealed class VideoJsInterop : IVideoJsInterop
     private readonly CancellationScope _cancellationScope = new();
     private int _disposed;
 
-    public VideoJsInterop(ILogger<VideoJsInterop> logger, IResourceLoader resourceLoader, IModuleImportUtil moduleImportUtil)
+    public VideoJsInterop(ILogger<VideoJsInterop> logger, IResourceLoader resourceLoader, IModuleImportUtil moduleImportUtil, System.Text.Json.Serialization.JsonSerializerContext? jsonContext = null)
     {
+        _jsonOptions = LibraryJsonContext.WithContext(jsonContext);
         _logger = logger;
         _resourceLoader = resourceLoader;
         _moduleImportUtil = moduleImportUtil;
@@ -89,7 +95,7 @@ public sealed class VideoJsInterop : IVideoJsInterop
             bool useCdn = configuration?.UseCdn ?? true;
             await _scriptInitializer.Init(useCdn, linked);
 
-            string? json = configuration == null ? null : JsonUtil.Serialize(configuration);
+            string? json = configuration == null ? null : JsonUtil.Serialize(configuration, GetJsonTypeInfo<VideoJsConfiguration>());
 
             IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
             await jsRef.InvokeVoidAsync("create", linked, elementReference, elementId, json);

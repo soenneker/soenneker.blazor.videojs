@@ -12,6 +12,7 @@ namespace Soenneker.Blazor.Videojs.Abstract;
 /// <summary>
 /// A Blazor interop library for Video.js
 /// </summary>
+/// <remarks>Library DTOs use generated JSON metadata. Register an additional source-generated JsonSerializerContext for custom values inside object-typed properties; unknown CLR types are rejected.</remarks>
 public interface IVideoJsInterop : IAsyncDisposable
 {
     /// <summary>
