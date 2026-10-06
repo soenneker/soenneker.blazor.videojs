@@ -1,3 +1,6 @@
+using System.Text.Json.Serialization.Metadata;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
@@ -20,6 +23,10 @@ namespace Soenneker.Blazor.Videojs;
 /// <inheritdoc cref="IVideoJsInterop"/>
 public sealed class VideoJsInterop : IVideoJsInterop
 {
+    private readonly JsonSerializerOptions _jsonOptions;
+
+    private JsonTypeInfo<T> GetJsonTypeInfo<T>() => (JsonTypeInfo<T>)_jsonOptions.GetTypeInfo(typeof(T));
+
 
 
     private const string _modulePath = "_content/Soenneker.Blazor.Videojs/js/videojsinterop.js";
@@ -38,8 +45,9 @@ public sealed class VideoJsInterop : IVideoJsInterop
     private readonly CancellationScope _cancellationScope = new();
     private int _disposed;
 
-    public VideoJsInterop(ILogger<VideoJsInterop> logger, IResourceLoader resourceLoader, IModuleImportUtil moduleImportUtil)
+    public VideoJsInterop(ILogger<VideoJsInterop> logger, IResourceLoader resourceLoader, IModuleImportUtil moduleImportUtil, JsonSerializerContext? jsonContext = null)
     {
+        _jsonOptions = LibraryJsonContext.WithContext(jsonContext);
         _logger = logger;
         _resourceLoader = resourceLoader;
         _moduleImportUtil = moduleImportUtil;
@@ -91,7 +99,7 @@ public sealed class VideoJsInterop : IVideoJsInterop
             bool useCdn = configuration?.UseCdn ?? true;
             await _scriptInitializer.Init(useCdn, linked);
 
-            string? json = configuration == null ? null : JsonUtil.Serialize(configuration);
+            string? json = configuration == null ? null : JsonUtil.Serialize(configuration, GetJsonTypeInfo<VideoJsConfiguration>());
 
             IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
             await jsRef.InvokeVoidAsync("create", linked, elementReference, elementId, json);

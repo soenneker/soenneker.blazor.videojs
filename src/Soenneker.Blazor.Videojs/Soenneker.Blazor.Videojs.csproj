@@ -51,4 +51,7 @@
         <PackageReference Include="Soenneker.Lepton.Suite" Version="4.0.93" />
         <PackageReference Include="Soenneker.Utils.Json" Version="4.0.2735" />
     </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Soenneker.Blazor.Videojs.TrimSmoke" />
+    </ItemGroup>
 </Project>
