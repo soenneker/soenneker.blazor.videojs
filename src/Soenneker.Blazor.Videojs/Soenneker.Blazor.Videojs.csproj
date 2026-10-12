@@ -45,11 +45,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Soenneker.Asyncs.Initializers" Version="4.0.113" />
-        <PackageReference Include="Soenneker.Blazor.Extensions.EventCallback" Version="4.0.463" />
-        <PackageReference Include="Soenneker.Blazor.Utils.ResourceLoader" Version="4.0.1768" />
-        <PackageReference Include="Soenneker.Lepton.Suite" Version="4.0.93" />
-        <PackageReference Include="Soenneker.Utils.Json" Version="4.0.2735" />
+        <PackageReference Include="Soenneker.Asyncs.Initializers" Version="4.0.114" />
+        <PackageReference Include="Soenneker.Blazor.Extensions.EventCallback" Version="4.0.464" />
+        <PackageReference Include="Soenneker.Blazor.Utils.ResourceLoader" Version="4.0.1776" />
+        <PackageReference Include="Soenneker.Lepton.Suite" Version="4.0.99" />
+        <PackageReference Include="Soenneker.Utils.Json" Version="4.0.2738" />
     </ItemGroup>
     <ItemGroup>
         <InternalsVisibleTo Include="Soenneker.Blazor.Videojs.TrimSmoke" />
