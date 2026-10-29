@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
+using Soenneker.Blazor.Extensions.IJSObjectReferences;
 using Soenneker.Asyncs.Initializers;
 using Soenneker.Blazor.Utils.ModuleImport.Abstract;
 using Soenneker.Blazor.Utils.ResourceLoader.Abstract;
@@ -96,20 +97,13 @@ public sealed class VideoJsInterop : IVideoJsInterop
 
         using (source)
         {
-            try
-            {
-                bool useCdn = configuration?.UseCdn ?? true;
-                await _scriptInitializer.Init(useCdn, linked);
+            bool useCdn = configuration?.UseCdn ?? true;
+            await _scriptInitializer.Init(useCdn, linked);
 
-                string? json = configuration == null ? null : JsonUtil.Serialize(configuration, GetJsonTypeInfo<VideoJsConfiguration>());
+            string? json = configuration == null ? null : JsonUtil.Serialize(configuration, GetJsonTypeInfo<VideoJsConfiguration>());
 
-                IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-                await jsRef.InvokeVoidAsync("create", linked, elementReference, elementId, json);
-            }
-            catch (JSException exception)
-            {
-                throw new JSException($"JavaScript operation 'VideoJsInterop.Create' failed: {exception.Message}", exception);
-            }
+            IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await jsRef.InvokeVoidWithContextAsync("create", linked, elementReference, elementId, json);
         }
     }
 
@@ -120,15 +114,8 @@ public sealed class VideoJsInterop : IVideoJsInterop
 
         using (source)
         {
-            try
-            {
-                IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-                await jsRef.InvokeVoidAsync("updateSources", linked, elementId, sources);
-            }
-            catch (JSException exception)
-            {
-                throw new JSException($"JavaScript operation 'VideoJsInterop.UpdateSources' failed: {exception.Message}", exception);
-            }
+            IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await jsRef.InvokeVoidWithContextAsync("updateSources", linked, elementId, sources);
         }
     }
 
@@ -139,15 +126,8 @@ public sealed class VideoJsInterop : IVideoJsInterop
 
         using (source)
         {
-            try
-            {
-                IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-                await jsRef.InvokeVoidAsync("setPoster", linked, elementId, poster);
-            }
-            catch (JSException exception)
-            {
-                throw new JSException($"JavaScript operation 'VideoJsInterop.SetPoster' failed: {exception.Message}", exception);
-            }
+            IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await jsRef.InvokeVoidWithContextAsync("setPoster", linked, elementId, poster);
         }
     }
 
@@ -160,15 +140,8 @@ public sealed class VideoJsInterop : IVideoJsInterop
 
         using (source)
         {
-            try
-            {
-                IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-                await jsRef.InvokeVoidAsync("registerEvent", linked, elementId, eventName, dotNetReference, callbackMethod);
-            }
-            catch (JSException exception)
-            {
-                throw new JSException($"JavaScript operation 'VideoJsInterop.RegisterEvent' failed: {exception.Message}", exception);
-            }
+            IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await jsRef.InvokeVoidWithContextAsync("registerEvent", linked, elementId, eventName, dotNetReference, callbackMethod);
         }
     }
 
@@ -180,15 +153,8 @@ public sealed class VideoJsInterop : IVideoJsInterop
 
         using (source)
         {
-            try
-            {
-                IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-                await jsRef.InvokeVoidAsync("unregisterEvent", linked, elementId, eventName);
-            }
-            catch (JSException exception)
-            {
-                throw new JSException($"JavaScript operation 'VideoJsInterop.UnregisterEvent' failed: {exception.Message}", exception);
-            }
+            IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await jsRef.InvokeVoidWithContextAsync("unregisterEvent", linked, elementId, eventName);
         }
     }
 
@@ -199,15 +165,8 @@ public sealed class VideoJsInterop : IVideoJsInterop
 
         using (source)
         {
-            try
-            {
-                IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
-                await jsRef.InvokeVoidAsync("dispose", linked, elementId);
-            }
-            catch (JSException exception)
-            {
-                throw new JSException($"JavaScript operation 'VideoJsInterop.Dispose' failed: {exception.Message}", exception);
-            }
+            IJSObjectReference jsRef = await _moduleImportUtil.GetContentModuleReference(_modulePath, linked);
+            await jsRef.InvokeVoidWithContextAsync("dispose", linked, elementId);
         }
     }
 
