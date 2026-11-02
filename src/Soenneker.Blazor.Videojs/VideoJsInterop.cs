@@ -30,7 +30,7 @@ public sealed class VideoJsInterop : IVideoJsInterop
 
 
 
-    private const string _modulePath = "_content/Soenneker.Blazor.Videojs/js/videojsinterop.js";
+    private const string _modulePath = "_content/Soenneker.Blazor.Videojs/js/videojsinterop.min.js";
     private const string _cdnCssUrl = "https://cdn.jsdelivr.net/npm/video.js@8.24.0/dist/video-js.min.css";
     private const string _cdnCssIntegrity = "sha256-aZM6nunxxsAVKRkQNSLoYiISSWTiGV0o6y0MBDwm9Zw=";
     private const string _cdnScriptUrl = "https://cdn.jsdelivr.net/npm/video.js@8.24.0/dist/video.min.js";
